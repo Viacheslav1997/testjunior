@@ -1,7 +1,9 @@
 package tokens
 
 import (
+	"encoding/base64"
 	"github.com/golang-jwt/jwt"
+	"golang.org/x/crypto/bcrypt"
 	"log"
 	"time"
 )
@@ -13,7 +15,15 @@ type PayloadData struct {
 	jwt.StandardClaims
 }
 
-// GenerateAllTokens generates both teh detailed token and refresh token
+func Bcrypt(pass string) (Encrypted string) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(pass), 4)
+	if err != nil {
+		log.Panic(err)
+		return
+	}
+	return string(hash)
+}
+
 func GenerateAllTokens(uid string) (signedToken string, signedRefreshToken string) {
 	claims := &PayloadData{
 
@@ -31,11 +41,12 @@ func GenerateAllTokens(uid string) (signedToken string, signedRefreshToken strin
 
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS512, claims).SignedString([]byte(SECRET_KEY))
 	refreshToken, err := jwt.NewWithClaims(jwt.SigningMethodHS512, refreshClaims).SignedString([]byte(SECRET_KEY))
+	refreshTokenBase64 := base64.StdEncoding.EncodeToString([]byte(refreshToken))
 
 	if err != nil {
 		log.Panic(err)
 		return
 	}
 
-	return token, refreshToken
+	return token, refreshTokenBase64
 }
