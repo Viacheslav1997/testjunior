@@ -39,16 +39,9 @@ func Check_session(user_Id string) (r int, error error, result models.User) {
 func Check_refresh_token(refresh_token string, result models.User) (r bool, error error) {
 	if result.Refresh_token != nil {
 		err := bcrypt.CompareHashAndPassword([]byte(*result.Refresh_token), []byte(refresh_token))
-		fmt.Println("**************************")
-		fmt.Println(*result.Refresh_token)
-		fmt.Println(refresh_token)
-		fmt.Println(err)
-		fmt.Println("**************************")
 		if err != nil {
-			fmt.Println("false")
 			return false, err
 		}
-		fmt.Println("true")
 		return true, nil
 	}
 	fmt.Println("3")

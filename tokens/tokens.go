@@ -34,12 +34,6 @@ func GenerateAllTokens(uid string) (signedToken string, signedRefreshToken strin
 		},
 	}
 
-	//refreshClaims := &PayloadData{
-	//	StandardClaims: jwt.StandardClaims{
-	//		ExpiresAt: time.Now().Local().Add(time.Hour * time.Duration(168)).Unix(),
-	//	},
-	//}
-
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS512, claims).SignedString([]byte(SECRET_KEY))
 	refreshToken := uuid.New()
 	refreshTokenBase64 := base64.StdEncoding.EncodeToString([]byte(refreshToken.String()))

@@ -41,12 +41,3 @@ func Connect(client *mongo.Client, collectionName string) *mongo.Collection {
 
 	return collection
 }
-
-//func Disconnect(client *mongo.Client) {
-//	err := client.Disconnect(context.TODO())
-//
-//	if err != nil {
-//		log.Fatal(err)
-//	}
-//	fmt.Println("Connection to MongoDB closed.")
-//}
