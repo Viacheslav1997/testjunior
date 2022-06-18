@@ -3,6 +3,7 @@ package tokens
 import (
 	"encoding/base64"
 	"github.com/golang-jwt/jwt"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"time"
@@ -16,7 +17,7 @@ type PayloadData struct {
 }
 
 func Bcrypt(pass string) (Encrypted string) {
-	hash, err := bcrypt.GenerateFromPassword([]byte(pass), 4)
+	hash, err := bcrypt.GenerateFromPassword([]byte(pass), 12)
 	if err != nil {
 		log.Panic(err)
 		return
@@ -33,15 +34,15 @@ func GenerateAllTokens(uid string) (signedToken string, signedRefreshToken strin
 		},
 	}
 
-	refreshClaims := &PayloadData{
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Local().Add(time.Hour * time.Duration(168)).Unix(),
-		},
-	}
+	//refreshClaims := &PayloadData{
+	//	StandardClaims: jwt.StandardClaims{
+	//		ExpiresAt: time.Now().Local().Add(time.Hour * time.Duration(168)).Unix(),
+	//	},
+	//}
 
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS512, claims).SignedString([]byte(SECRET_KEY))
-	refreshToken, err := jwt.NewWithClaims(jwt.SigningMethodHS512, refreshClaims).SignedString([]byte(SECRET_KEY))
-	refreshTokenBase64 := base64.StdEncoding.EncodeToString([]byte(refreshToken))
+	refreshToken := uuid.New()
+	refreshTokenBase64 := base64.StdEncoding.EncodeToString([]byte(refreshToken.String()))
 
 	if err != nil {
 		log.Panic(err)
