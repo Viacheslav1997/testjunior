@@ -12,12 +12,9 @@ import (
 	"testjunior/models"
 )
 
-var collection *mongo.Collection = Connect(Client, "user")
+var collection *mongo.Collection = Connect(Client, DbCollectionName)
 
-// Check_session
-//1 - если есть пользователь с таким GUID
-//0 - если пользователя с таким GUID нет
-func Check_session(user_Id string) (r int, error error, result models.User) {
+func Check_session(user_Id string) (r bool, error error, result models.User) {
 	//Создаем фильтр для поиска по бд, если сессия с таким GUID уже существует
 	filter := bson.D{{"user_id", user_Id}}
 
@@ -26,14 +23,14 @@ func Check_session(user_Id string) (r int, error error, result models.User) {
 	err := collection.FindOne(context.TODO(), filter).Decode(&result)
 
 	if err != nil {
-		return 0, error, result
+		return false, error, result
 	}
 
 	if &result != nil {
 		fmt.Printf("Found a single document: %+v\n", result)
-		return 1, nil, result
+		return true, nil, result
 	}
-	return 0, nil, result
+	return false, nil, result
 }
 
 func Check_refresh_token(refresh_token string, result models.User) (r bool, error error) {
