@@ -15,35 +15,38 @@ type Tokens struct {
 }
 
 func RecieveHandler(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodPost:
+		guid := r.URL.Query().Get("GUID")
 
-	guid := r.URL.Query().Get("GUID")
-
-	res, err, _ := database.Check_session(guid)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if res == 1 {
-		fmt.Fprint(w, "Session for this user already exist")
-	} else if res == 0 {
-		access_token, refresh_token64 := tokens.GenerateAllTokens(guid)
-		refresh_hash := tokens.Bcrypt(refresh_token64)
-		database.Save_tokens(refresh_hash, guid)
-
-		t := Tokens{
-			Access_token:  access_token,
-			Refresh_token: refresh_token64,
-		}
-
-		mess, err := json.Marshal(t)
+		res, err, _ := database.Check_session(guid)
 
 		if err != nil {
-			log.Panic(err)
-			return
+			log.Fatal(err)
 		}
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(mess)
-	}
 
+		if res {
+			fmt.Fprint(w, "Session for this user already exist")
+		} else if !res {
+			access_token, refresh_token64 := tokens.GenerateAllTokens(guid)
+			refresh_hash := tokens.Bcrypt(refresh_token64)
+			database.Save_tokens(refresh_hash, guid)
+
+			t := Tokens{
+				Access_token:  access_token,
+				Refresh_token: refresh_token64,
+			}
+
+			mess, err := json.Marshal(t)
+			if err != nil {
+				log.Panic(err)
+				return
+			}
+
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(mess)
+		}
+	default:
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	}
 }
