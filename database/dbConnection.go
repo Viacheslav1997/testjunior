@@ -8,8 +8,6 @@ import (
 	"log"
 )
 
-const DbUrl string = "mongodb://127.0.0.1:27017"
-
 func getClient() *mongo.Client {
 	// Create client
 	client, err := mongo.NewClient(options.Client().ApplyURI(DbUrl))
@@ -37,7 +35,7 @@ func Connect(client *mongo.Client, collectionName string) *mongo.Collection {
 
 	fmt.Println("Connected to MongoDB!")
 
-	collection := client.Database("test").Collection(collectionName)
+	collection := client.Database(DbName).Collection(collectionName)
 
 	return collection
 }
